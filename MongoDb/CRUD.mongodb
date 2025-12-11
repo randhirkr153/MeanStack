@@ -1,0 +1,56 @@
+show dbs
+
+use sangrah
+//create one 
+db.myCollection.insertOne({
+  name: "Kishore",
+  age: 25,
+  city: "Khandawa"
+})
+
+// create many
+db.myCollection.insertMany([
+  { name: "Pawan singh", age: 22 },
+  { name: "Randhir K.", age: 30 },
+  { name: "Udit Narayan", age: 28 }
+])
+
+
+// Find all documents
+db.myCollection.find()
+
+// Find one document
+db.myCollection.findOne({ name: "Kishore" })
+
+
+
+// Update one
+db.myCollection.updateOne(
+  { name: "Kishore" }, 
+  { $set: { age: 63 } }
+)
+
+db.myCollection.findOne({ name: "Kishore" })
+
+// Update many
+db.myCollection.updateMany(
+  { age: { $lt: 25 } },
+  { $set: { city: "Delhi" } }
+)
+
+// Replace a document
+db.myCollection.replaceOne(
+  { name: "Kishore" },
+  { name: "Kishore", age: 58, city: "MP" }
+)
+
+//Delete one
+db.myCollection.deleteOne({ name: "Pawan singh" })
+
+db.myCollection.find()
+// Delete many
+db.myCollection.deleteMany({ age: { $gt: 27 } })
+// Drop the entire collection
+db.myCollection.drop()
+
+
