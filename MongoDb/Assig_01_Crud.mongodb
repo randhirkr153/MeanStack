@@ -1,0 +1,210 @@
+//2. CRUD Methods
+
+
+//2.1 Insert one document into employees with {id:1, name:"John", age:30, role:"Manager"}.
+db.employees.insertOne({ id: 1, name: "John", age: 30, role: "Manager" })
+
+//2.2 Insert multiple documents at once:
+
+db.employees.insertMany([
+  { id: 2, name: "Alice", age: 25, role: "Developer" },
+  { id: 3, name: "Bob", age: 28, role: "Tester" }
+])
+
+
+
+//2.3 Find all employees with age greater than 25.
+db.employees.find({ age: { $gt: 25 } })
+
+//2.4 Find one employee with the name “Alice”.
+db.employees.findOne({ name: "Alice" })
+
+//2.5 Update Bob’s role to “Senior Tester” using a single method.
+db.employees.updateOne(
+  { name: "Bob" },
+  { $set: { role: "Senior Tester" } }
+)
+
+//2.6 Increment Alice’s age by 1 using the appropriate update operator.
+db.employees.updateOne(
+  { name: "Alice" },
+  { $inc: { age: 1 } }
+)
+
+//2.7 Delete the employee with id:2.
+db.employees.deleteOne({ id: 2 })
+
+//2.8 Count the number of employees who have age less than 30.
+db.employees.countDocuments({ age: { $lt: 30 } })
+
+//3. Indexing & Aggregation Methods
+
+//3.1 Create an index on the name field of employees.
+db.employees.createIndex({ name: 1 })
+
+//3.2 Create a compound index on {role:1, age:-1}.
+db.employees.createIndex({ role: 1, age: -1 })
+
+//3.3 Get all indexes of the employees collection.
+db.employees.getIndexes()
+
+//3.4 Use aggregation to group employees by role and count how many employees are in each role.
+db.employees.aggregate([
+  { $group: { _id: "$role", count: { $sum: 1 } } }
+])
+
+//4. Miscellaneous Methods
+
+//4.1 Sort employees by age in descending order.
+db.employees.find().sort({ age: -1 })
+
+//4.2 Limit the result to top 2 oldest employees.
+db.employees.find().sort({ age: -1 }).limit(2)
+
+//4.3 Rename the employees collection to staff.
+db.employees.renameCollection("staff")
+
+//4.4 Update a document to set the lastModified field to the current date.
+db.staff.updateOne(
+  { name: "John" },
+  { $currentDate: { lastModified: true } }
+)
+
+//B. MongoDB Operators Questions
+
+//1. Comparison Operators
+
+
+//1.1 Find all employees with age greater than 25.
+db.staff.find({ age: { $gt: 25 } })
+
+//1.2 Find all employees whose age is between 25 and 30.
+db.staff.find({ age: { $gte: 25, $lte: 30 } })
+
+//1.3 Find employees whose name is either "John" or "Alice".
+db.staff.find({ name: { $in: ["John", "Alice"] } })
+
+//1.4 Find employees whose role is not “Developer”.
+db.staff.find({ role: { $ne: "Developer" } })
+
+//2. Logical Operators
+
+//2.1 Find employees who are managers and older than 30.
+db.staff.find({ $and: [{ role: "Manager" }, { age: { $gt: 30 } }] })
+
+//2.2 Find employees who are either Developers or Testers.
+db.staff.find({ role: { $in: ["Developer", "Tester"] } })
+
+//2.3 Find employees who are not older than 28.
+db.staff.find({ age: { $not: { $gt: 28 } } })
+
+//2.4 Find employees who are not Developers AND not Testers.
+db.staff.find({ role: { $nin: ["Developer", "Tester"] } })
+
+//2.5 Combine operators: Find employees who are active AND (age < 30 OR role = “Manager”).
+db.staff.find({
+  $and: [
+    { status: "active" },
+    { $or: [{ age: { $lt: 30 } }, { role: "Manager" }] }
+  ]
+})
+
+//3. Update Operators
+
+//3.1 Update an employee to set role to “Lead Developer”.
+db.staff.updateOne(
+  { name: "Alice" },
+  { $set: { role: "Lead Developer" } }
+)
+
+//3.2 Increment age of all employees by 1.
+db.staff.updateMany({}, { $inc: { age: 1 } })
+
+//3.3 Multiply the salary field of an employee by 2.
+db.staff.updateOne(
+  { name: "John" },
+  { $mul: { salary: 2 } }
+)
+
+//3.4 Rename the field role to position.
+db.staff.updateMany({}, { $rename: { role: "position" } })
+
+//3.5 Remove the temporary field from all employees.
+db.staff.updateMany({}, { $unset: { temporary: "" } })
+
+//3.6 Set a field lastLogin to the current date.
+db.staff.updateMany({}, { $currentDate: { lastLogin: true } })
+
+//4. Array Operators
+
+//4.1 Add a new hobby "reading" to an employee’s hobbies array.
+db.staff.updateOne(
+  { name: "John" },
+  { $push: { hobbies: "reading" } }
+)
+
+//4.2 Add multiple hobbies ["chess", "swimming"] and sort descending.
+db.staff.updateOne(
+  { name: "John" },
+  { $push: { hobbies: { $each: ["chess", "swimming"], $sort: -1 } } }
+)
+
+//4.3 Remove "reading" from hobbies.
+db.staff.updateOne(
+  { name: "John" },
+  { $pull: { hobbies: "reading" } }
+)
+
+//4.4 Add a hobby only if it does not exist already.
+db.staff.updateOne(
+  { name: "John" },
+  { $addToSet: { hobbies: "chess" } }
+)
+
+//4.5 Limit an array to top 3 scores after pushing new scores [80, 90, 85].
+db.staff.updateOne(
+  { name: "John" },
+  {
+    $push: {
+      scores: {
+        $each: [80, 105, 85],
+        $sort: -1,
+        $slice: 3
+      }
+    }
+  }
+)
+
+//5. Mixed/Combined Questions
+
+//5.1 Find employees whose age is between 25-30 and role is Developer.
+db.staff.find({
+  age: { $gte: 25, $lte: 30 },
+  role: "Developer"
+})
+
+//5.2 Update an employee to increment age by 1, set status = “active”, and update lastModified date.
+db.staff.updateOne(
+  { name: "Alice" },
+  {
+    $inc: { age: 1 },
+    $set: { status: "active" },
+    $currentDate: { lastModified: true }
+  }
+)
+
+//5.3 Find employees whose hobbies include "chess" and age > 25.
+db.staff.find({
+  hobbies: "chess",
+  age: { $gt: 25 }
+})
+
+//5.4 Aggregate employees by role and sum their ages.
+db.staff.aggregate([
+  {
+    $group: {
+      _id: "$role",
+      totalAge: { $sum: "$age" }
+    }
+  }
+])
